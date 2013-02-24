@@ -52,6 +52,7 @@ public class TaxCommand {
 						s.sendMessage("§3Tax Percent: §a" + highpercent + "%");
 						s.sendMessage("§3Taxes Due: §a" + rounded);
 					}
+					s.sendMessage("§3Last Paid Taxes: §a" + plugin.getConfig().getString("players." + s.getName()));
 					s.sendMessage("§3Balance: §a" + balance);
 					if (s.hasPermission("taxes.exempt")) {
 						s.sendMessage("§3Status: §cExempt");
@@ -60,6 +61,15 @@ public class TaxCommand {
 					}
 					return true;
 				} if (args.length == 1) {
+					if (args[0].equalsIgnoreCase("reload")) {
+						if (!s.hasPermission("taxes.reload")) {
+							s.sendMessage("§cYou don't have permission to do that!");
+							return true;
+						} else {
+							plugin.reloadConfig();
+							s.sendMessage("§aTaxes Configuration Reloaded.");
+						}
+					}
 					if (args[0].equalsIgnoreCase("collect")) {
 						if (!s.hasPermission("taxes.collect")) {
 							s.sendMessage("§cYou don't have permission to do that!");

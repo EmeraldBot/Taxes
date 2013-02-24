@@ -5,6 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
@@ -13,19 +16,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Taxes extends JavaPlugin {
-	
+
 	public static Economy ep;;
-	
+
 	protected static Logger log;
-	
+
 	public static Taxes instance;
-	
+
 	TaxCommand tc;
 	
+	private final TaxListener tL = new TaxListener(this);
+
 	File configFile;
 	FileConfiguration config;
 
@@ -34,33 +40,35 @@ public class Taxes extends JavaPlugin {
 		setupEconomy();
 		instance = this;
 		this.log = this.getLogger();
-		
+
 		tc = new TaxCommand(this);
 		configFile = new File(getDataFolder(), "config.yml");
-		
+
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(tL, this);
 		try {
 			firstRun();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		config = new YamlConfiguration();
 		loadYamls();
 	}
-	
+
 	@Override
 	public void onDisable() {
 		//
 	}
-	
+
 	// Methods
-	
+
 	private boolean setupEconomy() {
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
 		ep = economyProvider.getProvider();
 		return (ep != null);
 	}
-	
+
 	public void firstRun() throws Exception {
 		if (!configFile.exists()) {
 			configFile.getParentFile().mkdirs();
@@ -68,7 +76,7 @@ public class Taxes extends JavaPlugin {
 			log.info("Config not found, Generating.");
 		}
 	}
-	
+
 	private void loadYamls() {
 		try {
 			config.load(configFile);
@@ -76,7 +84,8 @@ public class Taxes extends JavaPlugin {
 			e.printStackTrace();
 		}
 	}
-	
+
+
 	private void copy(InputStream in, File file) {
 		try {
 			OutputStream out = new FileOutputStream(file);
@@ -91,7 +100,7 @@ public class Taxes extends JavaPlugin {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void saveYamls() {
 		try {
 			config.save(configFile);
@@ -99,11 +108,11 @@ public class Taxes extends JavaPlugin {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static Taxes getInstance() {
 		return instance;
 	}
-	
+
 	public void CollectTaxes() {
 		for(Player player: Bukkit.getOnlinePlayers()) {
 			Bukkit.broadcastMessage("§4Taxes are due. Collecting.");
@@ -119,21 +128,21 @@ public class Taxes extends JavaPlugin {
 				double middletax = balance * getConfig().getDouble("taxbrackets.middle");
 				double hightax = balance * getConfig().getDouble("taxbrackets.high");
 				String serveraccount = getConfig().getString("general.account");
-				
+
 				if (balance >= low && balance < middle) {
 					String rounded = ep.format(lowtax);
 					ep.withdrawPlayer(player.getName(), lowtax);
 					ep.depositPlayer(serveraccount, lowtax);
 					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
 				}
-				
+
 				if (balance >= middle && balance < high) {
 					String rounded = ep.format(middletax);
 					ep.withdrawPlayer(player.getName(), middletax);
 					ep.depositPlayer(serveraccount, middletax);
 					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
 				}
-				
+
 				if (balance >= high) {
 					String rounded = ep.format(hightax);
 					ep.withdrawPlayer(player.getName(), hightax);
@@ -143,5 +152,11 @@ public class Taxes extends JavaPlugin {
 			}
 		}
 	}
-	
+
+	public String getCurrentDate() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = new Date();
+		return dateFormat.format(date);
+	}
+
 }

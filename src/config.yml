@@ -8,3 +8,5 @@ requirements:
   high: 50000
   middle: 10000
   low: 0
+#Don't edit anything below this.
+players:
