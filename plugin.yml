@@ -1,0 +1,8 @@
+name: Taxes
+main: com.mistphizzle.taxes.Taxes
+author: MistPhizzle
+version: 1.0
+depend: [Vault]
+commands:
+  tax:
+    usage: /<command> [collect]
