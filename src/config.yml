@@ -8,5 +8,9 @@ requirements:
   high: 50000
   middle: 10000
   low: 0
+maxtaxes:
+  high: 25000
+  middle: 5000
+  low: 2000
 #Don't edit anything below this.
 players:

@@ -32,25 +32,40 @@ public class TaxCommand {
 					double lowtax = balance * plugin.getConfig().getDouble("taxbrackets.low");
 					double middletax = balance * plugin.getConfig().getDouble("taxbrackets.middle");
 					double hightax = balance * plugin.getConfig().getDouble("taxbrackets.high");
+					double maxlowtax = plugin.getConfig().getDouble("maxtaxes.low");
+					double maxmiddletax = plugin.getConfig().getDouble("maxtaxes.middle");
+					double maxhightax = plugin.getConfig().getDouble("maxtaxes.high");
 
 					if (balance >= low && balance < middle) {
 						String rounded = Taxes.ep.format(lowtax);
 						s.sendMessage("§3Tax Bracket: §aLow");
 						s.sendMessage("§3Tax Percent: §a" + lowpercent + "%");
-						s.sendMessage("§3Taxes Due: §a" + rounded);
+						if (lowtax > maxlowtax) {
+							s.sendMessage("§3Taxes Due: §a" + maxlowtax);
+						} else {
+							s.sendMessage("§3Taxes Due: §a" + rounded);
+						}
 					}
 					if (balance >= middle && balance < high) {
 						String rounded = Taxes.ep.format(middletax);
 						s.sendMessage("§3Tax Bracket: §aMiddle");
 						s.sendMessage("§3Tax Percent: §a" + middlepercent + "%");
-						s.sendMessage("§3Taxes Due: §a" + rounded);
+						if (middletax > maxmiddletax) {
+							s.sendMessage("§3Taxes Due: §a" + maxmiddletax);
+						} else {
+							s.sendMessage("§3Taxes Due: §a" + rounded);
+						}
 					}
 
 					if (balance >= high) {
 						s.sendMessage("§3Tax Bracket: §aHigh");
 						String rounded = Taxes.ep.format(hightax);
 						s.sendMessage("§3Tax Percent: §a" + highpercent + "%");
-						s.sendMessage("§3Taxes Due: §a" + rounded);
+						if (hightax > maxhightax) {
+							s.sendMessage("§3Taxes Due: §a" + maxhightax);
+						} else {
+							s.sendMessage("§3Taxes Due: §a" + rounded);
+						}
 					}
 					s.sendMessage("§3Last Paid Taxes: §a" + plugin.getConfig().getString("players." + s.getName()));
 					s.sendMessage("§3Balance: §a" + balance);
