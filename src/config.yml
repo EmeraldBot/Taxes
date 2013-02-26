@@ -1,5 +1,6 @@
 general:
   account: ServerAccount
+  AutoChargeDaily: false
 taxbrackets:
   high: 0.20
   middle: 0.10

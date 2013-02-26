@@ -16,6 +16,8 @@ public class TaxListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin (PlayerJoinEvent e) {
 		Player player = e.getPlayer();
-		plugin.CollectTaxes(player);
+		if (plugin.getConfig().getBoolean("general.AutoChargeDaily")) {
+			plugin.CollectTaxes(player);
+		}
 	}
 }
