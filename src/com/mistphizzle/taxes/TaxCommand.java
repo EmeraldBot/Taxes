@@ -1,9 +1,11 @@
 package com.mistphizzle.taxes;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 
 public class TaxCommand {
 
@@ -90,7 +92,9 @@ public class TaxCommand {
 							s.sendMessage("§cYou don't have permission to do that!");
 							return true;
 						} else {
-							plugin.CollectTaxes();
+							for(Player player: Bukkit.getOnlinePlayers()) {
+								plugin.CollectTaxes(player);
+							}
 							return true;
 						}
 					}

@@ -29,7 +29,7 @@ public class Taxes extends JavaPlugin {
 	public static Taxes instance;
 
 	TaxCommand tc;
-	
+
 	private final TaxListener tL = new TaxListener(this);
 
 	File configFile;
@@ -113,50 +113,132 @@ public class Taxes extends JavaPlugin {
 		return instance;
 	}
 
-	public void CollectTaxes() {
-		for(Player player: Bukkit.getOnlinePlayers()) {
-			Bukkit.broadcastMessage("§4Taxes are due. Collecting.");
-			if (player.hasPermission("taxes.exempt")) {
-				player.sendMessage("§cYou are exempt from taxes.");
-			}
-			if (!player.hasPermission("taxes.exempt")) {
-				double balance = Taxes.ep.getBalance(player.getName());
-				int low = getConfig().getInt("requirements.low");
-				int middle = getConfig().getInt("requirements.middle");
-				int high = getConfig().getInt("requirements.high");
-				double lowtax = balance * getConfig().getDouble("taxbrackets.low");
-				double middletax = balance * getConfig().getDouble("taxbrackets.middle");
-				double hightax = balance * getConfig().getDouble("taxbrackets.high");
-				String serveraccount = getConfig().getString("general.account");
-
-				if (balance >= low && balance < middle) {
-					String rounded = ep.format(lowtax);
-					ep.withdrawPlayer(player.getName(), lowtax);
-					ep.depositPlayer(serveraccount, lowtax);
-					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
-				}
-
-				if (balance >= middle && balance < high) {
-					String rounded = ep.format(middletax);
-					ep.withdrawPlayer(player.getName(), middletax);
-					ep.depositPlayer(serveraccount, middletax);
-					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
-				}
-
-				if (balance >= high) {
-					String rounded = ep.format(hightax);
-					ep.withdrawPlayer(player.getName(), hightax);
-					ep.depositPlayer(serveraccount, hightax);
-					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
-				}
-			}
-		}
-	}
-
 	public String getCurrentDate() {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		return dateFormat.format(date);
 	}
 
+	public void CollectTaxes(Player player) {
+		String LastPaid = (String) getConfig().getString("players." + player.getName());
+		String date = getCurrentDate();
+
+		if (LastPaid == date) {
+			player.sendMessage("LAST PAID EQUALS DATE");
+			return;
+		}
+
+		if (player.hasPermission("taxes.exempt")) {
+			return;
+		}
+		//		Set<String> playerList = plugin.getPlayerConfig().getConfigurationSection("players").getKeys(true);
+
+		double balance = Taxes.ep.getBalance(player.getName());
+		int low = getConfig().getInt("requirements.low");
+		int middle = getConfig().getInt("requirements.middle");
+		int high = getConfig().getInt("requirements.high");
+		double lowtax = balance * getConfig().getDouble("taxbrackets.low");
+		double middletax = balance * getConfig().getDouble("taxbrackets.middle");
+		double hightax = balance * getConfig().getDouble("taxbrackets.high");
+		double maxlowtax = getConfig().getDouble("maxtaxes.low");
+		double maxmiddletax = getConfig().getDouble("maxtaxes.middle");
+		double maxhightax = getConfig().getDouble("maxtaxes.high");
+		String serveraccount = getConfig().getString("general.account");
+		if (getConfig().get("players." + player.getName()) == null) {
+			player.sendMessage("§cTaxes are due.");
+
+			if (balance >= low && balance < middle) {
+				String rounded = Taxes.ep.format(lowtax);
+				if (lowtax > maxlowtax) {
+					Taxes.ep.withdrawPlayer(player.getName(), maxlowtax);
+					Taxes.ep.depositPlayer(serveraccount, maxlowtax);
+					player.sendMessage("§3You just paid §6" + maxlowtax + " §3in taxes.");
+				} else {
+					Taxes.ep.withdrawPlayer(player.getName(), lowtax);
+					Taxes.ep.depositPlayer(serveraccount, lowtax);
+					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
+				}
+			}
+
+			if (balance >= middle && balance < high) {
+				String rounded = Taxes.ep.format(middletax);
+				if (middletax > maxmiddletax) {
+					Taxes.ep.withdrawPlayer(player.getName(), maxmiddletax);
+					Taxes.ep.depositPlayer(serveraccount, maxmiddletax);
+					player.sendMessage("§3You just paid §6" + maxmiddletax + " §3in taxes.");
+				} else {
+					Taxes.ep.withdrawPlayer(player.getName(), middletax);
+					Taxes.ep.depositPlayer(serveraccount, middletax);
+					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
+				}
+			}
+
+			if (balance > high) {
+
+				if (hightax > maxhightax) {
+					Taxes.ep.withdrawPlayer(player.getName(), maxhightax);
+					Taxes.ep.depositPlayer(serveraccount, maxhightax);
+					player.sendMessage("§3You just paid §6" + maxhightax + " §3in taxes.");
+				} else {
+					String rounded = Taxes.ep.format(hightax);
+					Taxes.ep.withdrawPlayer(player.getName(), hightax);
+					Taxes.ep.depositPlayer(serveraccount, hightax);
+					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
+				}
+			}
+
+			getConfig().set("players." + player.getName(), date);
+			saveConfig();
+
+			return;
+		}
+		if (!getConfig().getString("players." + player.getName()).equals(date)) {
+			player.sendMessage("§cTaxes are due.");
+
+			if (balance >= low && balance < middle) {
+				String rounded = Taxes.ep.format(lowtax);
+				if (lowtax > maxlowtax) {
+					Taxes.ep.withdrawPlayer(player.getName(), maxlowtax);
+					Taxes.ep.depositPlayer(serveraccount, maxlowtax);
+					player.sendMessage("§3You just paid §6" + maxlowtax + " §3in taxes.");
+				} else {
+					Taxes.ep.withdrawPlayer(player.getName(), lowtax);
+					Taxes.ep.depositPlayer(serveraccount, lowtax);
+					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
+				}
+			}
+
+			if (balance >= middle && balance < high) {
+				String rounded = Taxes.ep.format(middletax);
+				if (middletax > maxmiddletax) {
+					Taxes.ep.withdrawPlayer(player.getName(), maxmiddletax);
+					Taxes.ep.depositPlayer(serveraccount, maxmiddletax);
+					player.sendMessage("§3You just paid §6" + maxmiddletax + " §3in taxes.");
+				} else {
+					Taxes.ep.withdrawPlayer(player.getName(), middletax);
+					Taxes.ep.depositPlayer(serveraccount, middletax);
+					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
+				}
+			}
+
+			if (balance > high) {
+
+				if (hightax > maxhightax) {
+					Taxes.ep.withdrawPlayer(player.getName(), maxhightax);
+					Taxes.ep.depositPlayer(serveraccount, maxhightax);
+					player.sendMessage("§3You just paid §6" + maxhightax + " §3in taxes.");
+				} else {
+					String rounded = Taxes.ep.format(hightax);
+					Taxes.ep.withdrawPlayer(player.getName(), hightax);
+					Taxes.ep.depositPlayer(serveraccount, hightax);
+					player.sendMessage("§3You just paid §6" + rounded + " §3in taxes.");
+				}
+			}
+
+			getConfig().set("players." + player.getName(), date);
+			saveConfig();
+
+			return;
+		}
+	}
 }
