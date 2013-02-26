@@ -54,6 +54,13 @@ public class Taxes extends JavaPlugin {
 
 		config = new YamlConfiguration();
 		loadYamls();
+		
+		try {
+		    MetricsLite metrics = new MetricsLite(this);
+		    metrics.start();
+		} catch (IOException e) {
+		    // Failed to submit the stats :-(
+		}
 	}
 
 	@Override
