@@ -1,17 +1,32 @@
-general:
-  account: ServerAccount
-  AutoChargeDaily: false
-taxbrackets:
-  high: 0.20
-  middle: 0.10
-  low: 0.05
-requirements:
-  high: 50000
-  middle: 10000
-  low: 0
-maxtaxes:
-  high: 25000
-  middle: 5000
-  low: 2000
-#Don't edit anything below this.
-players:
+General:
+  Account: ServerAccount
+  DailyTaxes: true
+  BracketMethod: wealth
+  database: taxes.db
+  EnableMaxTaxes: true
+WealthTax:
+  Requirements:
+    low: 0.0
+    middle: 10000.0
+    high: 500000.0
+  TaxRates:
+    low: 0.05
+    middle: 0.10
+    high: 0.20
+  MaxTaxes:
+    low: 1000.0
+    middle: 5000.0
+    high: 1000000.0
+GroupTaxes:
+  TaxRates:
+    Admin: 0.20
+    Moderator: 0.10
+    Member: 0.05
+  MaxTaxes:
+    Admin: 1000000.0
+    Moderator: 5000.0
+    Member: 1000.0
+ExemptPlayers:
+- Player1
+- Player2
+  
